@@ -1,6 +1,6 @@
 ---
 - name: Install Apache on EC2 instances
-  hosts: localhost
+  host: localhost
   become: true
   tasks:
     - name: Update package repositories
