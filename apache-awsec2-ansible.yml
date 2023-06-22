@@ -1,0 +1,23 @@
+---
+- name: Install Apache on EC2 instances
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Update package repositories
+      yum:
+        name: "*"
+        state: latest
+      become: true
+
+    - name: Install Apache HTTP server
+      yum:
+        name: httpd
+        state: present
+      become: true
+
+    - name: Start Apache service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      become: true
