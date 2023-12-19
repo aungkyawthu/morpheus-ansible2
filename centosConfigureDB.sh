@@ -15,3 +15,8 @@ mysql -u$DB_USER -e "USE rolodex; CREATE TABLE contacts (
   email VARCHAR(100) NOT NULL,
   PRIMARY KEY (id)
 );"
+# Grant privileges to a user from any host
+mysql -u$DB_USER -p$DB_PASSWORD -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+
+# Flush privileges
+mysql -u$DB_USER -p$DB_PASSWORD -e "FLUSH PRIVILEGES;"
