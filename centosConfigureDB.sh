@@ -20,3 +20,5 @@ mysql -u$DB_USER -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION
 
 # Flush privileges
 mysql -u$DB_USER -e "FLUSH PRIVILEGES;"
+
+systemctl stop firewalld
