@@ -6,6 +6,8 @@
   become: yes
   become_user: root
   become_method: sudo
+  vars:
+    ansible_python_interpreter: /bin/python2
   tasks:
     - name: Creates directory
       file:

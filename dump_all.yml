@@ -1,0 +1,19 @@
+---
+- name: dump all
+  hosts: all
+ 
+  tasks:
+    - name: Print some debug information 
+      vars:  
+        gmsg: |
+          GROUPS Variables ("groups"):
+          --------------------------------
+          {{ hostvars[inventory_hostname]['env'] }}
+
+          Just var:
+          --------------------------------------
+          {{ env }}
+    
+      debug: 
+        msg: "{{ gmsg.split('\n') }}"       
+      tags: debug_info

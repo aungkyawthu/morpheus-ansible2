@@ -1,0 +1,22 @@
+---
+- name: Accept morpheus vars where config of morpheus is using split
+  hosts: localhost
+
+  tasks:
+    - name: Print the instance name
+      debug:
+        msg: "Value from Morpheus: {{ morpheus['customOptions']['instances'] }}"
+
+    - name: Store the value from moprheus to a var  
+      set_fact:
+        minstance: "{{ morpheus['customOptions']['instances'] }}"
+    
+    - name: Split the var with a delimeter
+      set_fact:
+        instance: "{{ minstance.split('_') }}"
+        
+
+    - debug:
+        msg: 
+        - "Instance name is: {{ instance.0 }} "
+        - "Instance ip is: {{ instance.1 }} "
