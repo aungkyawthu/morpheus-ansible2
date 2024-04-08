@@ -16,4 +16,4 @@ git clone https://github.com/aungkyawthu/php-quickstart.git
 cd php-quickstart/src/
 
 # Run PHP server in the background
-nohup php -S 192.168.9.35:5900 > /dev/null 2>&1 &
+nohup php -S 192.168.9.33:5900 > /dev/null 2>&1 &
