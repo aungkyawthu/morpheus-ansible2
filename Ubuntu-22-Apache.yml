@@ -1,6 +1,6 @@
 ---
 - name: Install Apache on Ubuntu 22.04
-  hosts: localhost
+  hosts: all
   become: yes
   connection: local
 
