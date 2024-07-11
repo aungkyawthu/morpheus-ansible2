@@ -2,6 +2,7 @@
 - name: Install Apache on Ubuntu 22.04
   hosts: all
   become: yes
+  become_method: sudo
   connection: local
 
   tasks:
