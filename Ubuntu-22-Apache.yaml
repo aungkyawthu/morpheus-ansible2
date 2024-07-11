@@ -1,0 +1,20 @@
+---
+- name: Install Apache on Ubuntu 22.04
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update the package index
+      apt:
+        update_cache: yes
+
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Start and enable Apache service
+      systemd:
+        name: apache2
+        state: started
+        enabled: yes
