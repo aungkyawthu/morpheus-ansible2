@@ -2,6 +2,7 @@
 - name: Install Apache on Ubuntu 22.04
   hosts: localhost
   become: yes
+  connection: local
 
   tasks:
     - name: Update the package index
