@@ -1,0 +1,21 @@
+---
+- name: Basic Windows Playbook Example
+  hosts: all  
+  gather_facts: false   # Disable fact gathering (enabled by default for Linux)
+
+  tasks:
+    # Task 1: Get disk information
+    - name: Check free disk space
+      ansible.windows.win_stat:
+        path: C:\\
+      register: disk_info
+
+    - name: Display disk info
+      debug:
+        var: disk_info.stat
+
+    # Task 2: Create a directory
+    - name: Create temp directory
+      ansible.windows.win_file:
+        path: C:\Temp\AnsibleDemo
+        state: directory
