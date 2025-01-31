@@ -1,0 +1,14 @@
+---
+- name: ICMP Ping Test Playbook
+  hosts: all
+  gather_facts: no
+ 
+  tasks:
+    - name: Perform ICMP ping on hosts
+      ansible.builtin.ping:
+      register: ping_result
+ 
+    - name: Display ping results
+      debug:
+        msg: "{{ inventory_hostname }} is reachable"
+      when: ping_result.ping == "pong"
