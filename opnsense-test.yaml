@@ -1,0 +1,54 @@
+- name: Add firewall rule to OPNsense
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - ansibleguy.opnsense
+
+  vars:
+    opnsense_host: "10.10.10.253"
+    opnsense_api_key: "EpaOcykmaDWvY/5biTs/S5/2lOsoRdQuE+WWBa/DJQDbl+GG77S645etyE6NTn0F2XabZYrB0oHknRlL"
+    opnsense_api_secret: "EauYJ2s20+xc5qfRD9wGpp3xo+lNhpSnV5D/apTuAHwdL0bMbP6wXZa9zAhVZvoBTO4ZcieQcSPYEeq2"
+
+  tasks:
+    - name: Listing
+      ansibleguy.opnsense.list:
+        firewall: "{{ opnsense_host }}"
+        api_key: "{{ opnsense_api_key }}"
+        api_secret: "{{ opnsense_api_secret }}"
+        ssl_verify: false
+        target: 'rule'
+      register: existing_entries
+
+    - name: Printing rules
+      ansible.builtin.debug:
+        var: existing_entries.data
+
+
+  tasks:
+    - name: Pulling aliases
+      ansibleguy.opnsense.list:
+        firewall: "{{ opnsense_host }}"
+        api_key: "{{ opnsense_api_key }}"
+        api_secret: "{{ opnsense_api_secret }}"
+        ssl_verify: false
+        target: 'alias'
+      register: existing_aliases
+
+    - name: Printing
+      ansible.builtin.debug:
+        var: existing_aliases.data
+
+    - name: Pulling routes
+      ansibleguy.opnsense.list:
+        firewall: "{{ opnsense_host }}"
+        api_key: "{{ opnsense_api_key }}"
+        api_secret: "{{ opnsense_api_secret }}"
+        ssl_verify: false
+        target: 'route'
+      register: existing_routes
+
+    - name: Printing
+      ansible.builtin.debug:
+        var: existing_routes.data
