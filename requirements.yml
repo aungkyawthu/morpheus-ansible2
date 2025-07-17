@@ -1,9 +1,10 @@
 ---
-- src: https://github.com/geerlingguy/ansible-role-java
-  name: java
+roles:
+  - src: https://github.com/geerlingguy/ansible-role-java
+    name: java
 
-- src: https://github.com/geerlingguy/ansible-role-apache
-  name: apache
+  - src: https://github.com/geerlingguy/ansible-role-apache
+    name: apache
 
 collections:
   - servicenow.itsm
