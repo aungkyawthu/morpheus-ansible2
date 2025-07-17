@@ -4,5 +4,5 @@
 - src: https://github.com/geerlingguy/ansible-role-apache
   name: apache
 
-collections:
+- collections:
   - servicenow.itsm
