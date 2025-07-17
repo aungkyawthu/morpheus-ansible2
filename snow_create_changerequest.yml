@@ -1,3 +1,4 @@
+---
 - name: Create a ServiceNow Change Request
   hosts: localhost
   connection: local
@@ -25,7 +26,7 @@
         # --- Change Request Details ---
         state: new
         type: normal  # Can be 'normal', 'standard', or 'emergency'
-        short_description: "Automated server patching - API driven"
+        short_description: "Install Antivirus Software on web-server-01"
         description: "This change was created by an Ansible playbook to apply security patches to web-server-01."
         assignment_group: "Cloud Operator Group" # IMPORTANT: This group must exist in your instance
         requested_by: "{{ snow_username }}" # Good practice to set the requester as the service account
@@ -37,9 +38,6 @@
     - name: Display the new Change Request number
       debug:
         msg: "Successfully created Change Request {{ new_change_request.record.number }} in instance {{ snow_instance }}."
-    - name: Display the Change Request details
-      debug:
-        msg: "Change Request Details: {{ new_change_request.record }}"
     - name: Create a Task for the new Change Request
       servicenow.itsm.change_request_task:
         instance:
