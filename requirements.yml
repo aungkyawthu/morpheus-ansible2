@@ -6,3 +6,6 @@
 
 - src: https://github.com/cohesity/ansible-collection
   name: cohesity
+
+collections:
+  - servicenow.itsm
