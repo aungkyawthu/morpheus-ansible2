@@ -26,7 +26,7 @@
         # --- Change Request Details ---
         state: new
         type: normal  # Can be 'normal', 'standard', or 'emergency'
-        short_description: "Install Antivirus Software on web-server-01"
+        short_description: "Install Antivirus Software on {{ morpheus['instance']['name'] }}"
         description: "This change was created by an Ansible playbook to apply security patches to web-server-01."
         assignment_group: "Cloud Operator Group" # IMPORTANT: This group must exist in your instance
         requested_by: "{{ snow_username }}" # Good practice to set the requester as the service account
