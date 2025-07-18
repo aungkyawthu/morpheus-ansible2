@@ -38,21 +38,3 @@
     - name: Display the new Change Request number
       debug:
         msg: "Successfully created Change Request {{ new_change_request.record.number }} in instance {{ snow_instance }}."
-    - name: Create a Task for the new Change Request
-      servicenow.itsm.change_request_task:
-        instance:
-          host: "https://{{ snow_instance }}.service-now.com"
-          username: "{{ snow_username }}"
-          password: "{{ snow_password }}"
-        state: new
-        change_request_number: "{{ new_change_request.record.number }}" # ➡️ Use the number from the registered variable
-        short_description: "Step 1 - Provision the virtual machine"
-        description: "Implement collision avoidance based on the newly installed TOF sensor arrays."
-        assignment_group: "Cloud Operator Group"
-      register: new_change_task
-
-    - name: Display a summary of what was created
-      debug:
-        msg:
-          - "Successfully created Change Request: {{ new_change_request.record.number }}"
-          - "Successfully created its child Task: {{ new_change_task.record.number }}"
