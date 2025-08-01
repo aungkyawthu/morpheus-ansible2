@@ -6,5 +6,3 @@ roles:
   - src: https://github.com/geerlingguy/ansible-role-apache
     name: apache
 
-collections:
-  - servicenow.itsm
