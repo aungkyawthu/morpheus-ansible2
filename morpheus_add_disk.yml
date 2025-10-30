@@ -3,8 +3,8 @@
   hosts: localhost
   gather_facts: false
   vars:
-    morpheus_api_url: "https://morpheus.lab.local/api"
-    morpheus_api_token: "2b5c7f4f-36c5-4b6f-ae59-31567356ad95"
+    morpheus_api_url: "https://lab-morpheus.lab.local/api"
+    morpheus_api_token: "bf53cb4d-3296-4d91-872f-fd8214b0cf80"
     instance_id: "{{ morpheus['instance']['id'] }}"
 
     # User Inputs from Morpheus Catalog
@@ -35,23 +35,34 @@
         msg: "No valid Data-Disk sizes provided by user. Skipping disk addition."
       when: valid_disks | length == 0
 
+
+    - name: Initialize volume list
+      ansible.builtin.set_fact:
+        vol_list: []
+
+    - name: Assemble volume entries from valid_disks
+      ansible.builtin.set_fact:
+        vol_list: >-
+          {{ (vol_list | default([])) + [
+              {
+                'id': -1,
+                'rootVolume': false,
+                'name': 'data-disk-' ~ (idx + 1),
+                'size': (item | int),
+                'storageType': 1,
+                'datastoreId': 'auto'
+              }
+            ]
+          }}
+      loop: "{{ valid_disks | map('int') | list }}"
+      loop_control:
+        index_var: idx
+
     - name: Build JSON payload for Morpheus API
       ansible.builtin.set_fact:
         resize_payload:
-          volumes: "{{ valid_disks | map('int') | map('extract_disk_info') | list }}"
+          volumes: "{{ vol_list }}"
           deleteOriginalVolumes: false
-      vars:
-        extract_disk_info: |
-          {% macro extract_disk_info(size, index=None) %}
-          {
-            "id": -1,
-            "rootVolume": false,
-            "name": "data-disk-{{ loop.index }}",
-            "size": {{ size }},
-            "storageType": 1,
-            "datastoreId": "auto"
-          }
-          {% endmacro %}
 
     - name: Debug - Show payload before execution
       ansible.builtin.debug:
