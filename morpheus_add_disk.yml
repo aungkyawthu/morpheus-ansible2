@@ -1,0 +1,92 @@
+---
+- name: Add additional disks to a Morpheus instance
+  hosts: localhost
+  gather_facts: false
+  vars:
+    morpheus_api_url: "https://morpheus.lab.local/api"
+    morpheus_api_token: "2b5c7f4f-36c5-4b6f-ae59-31567356ad95"
+    instance_id: "{{ morpheus['instance']['id'] }}"
+
+    # User Inputs from Morpheus Catalog
+    data_disk1_size: "{{ morpheus['customOptions']['data_disk1_size'] | default('', true) }}"
+    data_disk2_size: "{{ morpheus['customOptions']['data_disk2_size'] | default('', true) }}"
+    data_disk3_size: "{{ morpheus['customOptions']['data_disk3_size'] | default('', true) }}"
+    data_disk4_size: "{{ morpheus['customOptions']['data_disk4_size'] | default('', true) }}"
+    data_disk5_size: "{{ morpheus['customOptions']['data_disk5_size'] | default('', true) }}"
+    data_disk6_size: "{{ morpheus['customOptions']['data_disk6_size'] | default('', true) }}"
+
+  tasks:
+    - name: Build disk size list dynamically
+      ansible.builtin.set_fact:
+        disk_sizes:
+          - "{{ data_disk1_size }}"
+          - "{{ data_disk2_size }}"
+          - "{{ data_disk3_size }}"
+          - "{{ data_disk4_size }}"
+          - "{{ data_disk5_size }}"
+          - "{{ data_disk6_size }}"
+
+    - name: Filter valid (non-empty) disk sizes
+      ansible.builtin.set_fact:
+        valid_disks: "{{ disk_sizes | select('match', '^[0-9]+$') | list }}"
+
+    - name: Fail if no valid disk sizes provided
+      ansible.builtin.fail:
+        msg: "No valid Data-Disk sizes provided by user. Skipping disk addition."
+      when: valid_disks | length == 0
+
+    - name: Build JSON payload for Morpheus API
+      ansible.builtin.set_fact:
+        resize_payload:
+          volumes: "{{ valid_disks | map('int') | map('extract_disk_info') | list }}"
+          deleteOriginalVolumes: false
+      vars:
+        extract_disk_info: |
+          {% macro extract_disk_info(size, index=None) %}
+          {
+            "id": -1,
+            "rootVolume": false,
+            "name": "data-disk-{{ loop.index }}",
+            "size": {{ size }},
+            "storageType": 1,
+            "datastoreId": "auto"
+          }
+          {% endmacro %}
+
+    - name: Debug - Show payload before execution
+      ansible.builtin.debug:
+        var: resize_payload
+
+    - name: Call Morpheus API to add disks
+      ansible.builtin.uri:
+        url: "{{ morpheus_api_url }}/instances/{{ instance_id }}/resize"
+        method: PUT
+        headers:
+          Authorization: "Bearer {{ morpheus_api_token }}"
+          Content-Type: "application/json"
+        body: "{{ resize_payload | to_json }}"
+        status_code: [200, 202]
+        validate_certs: false
+      register: morpheus_response
+      retries: 3
+      delay: 5
+      until: morpheus_response.status in [200, 202]
+      failed_when: morpheus_response.status not in [200, 202]
+      changed_when: true
+
+    - name: Check API response
+      block:
+        - name: Validate success response
+          ansible.builtin.assert:
+            that:
+              - morpheus_response.json is defined
+              - morpheus_response.status in [200, 202]
+            success_msg: "Successfully added {{ valid_disks | length }} new disk(s) to instance ID {{ instance_id }}"
+            fail_msg: "Failed to add disks. API response invalid."
+      rescue:
+        - name: Print raw response for troubleshooting
+          ansible.builtin.debug:
+            var: morpheus_response
+        - name: Fail gracefully
+          ansible.builtin.fail:
+            msg: "Morpheus API call failed. Please check logs or response details above."
