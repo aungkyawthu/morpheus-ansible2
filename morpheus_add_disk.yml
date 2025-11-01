@@ -4,7 +4,7 @@
   gather_facts: false
   vars:
     morpheus_api_url: "https://lab-morpheus.lab.local/api"
-    morpheus_api_token: "xxxxx"
+    morpheus_api_token: "bf53cb4d-3296-4d91-872f-fd8214b0cf80"
     instance_id: "{{ morpheus['instance']['id'] }}"
 
     # User Inputs from Morpheus Catalog
