@@ -1,0 +1,52 @@
+---
+- name: "Collect hw info"
+  setup:
+    gather_subset:
+      - hardware
+
+- name: Store the os disk list count as a fact
+  set_fact:
+    disk_data_count: "{{ hostvars[inventory_hostname].ansible_devices.keys() | map('regex_search', 'sd.*') | select('string') | length }}"
+
+- name: Debug existing disk count
+  debug:
+    var: disk_data_count
+
+- name: Store the disk count of morpheus as a fact
+  set_fact:
+    disk_list_count: "{{ morpheus['instance']['containers'][0]['server']['volumes'] | length }}"
+
+- name: Debug instance disk count
+  debug:
+    var: disk_list_count
+
+- name: Convert counts to integers
+  set_fact:
+    disk_data_count_int: "{{ disk_data_count | int }}"
+    disk_list_count_int: "{{ disk_list_count | int }}"
+
+- name: Debug converted counts
+  debug:
+    msg: "disk_data_count_int: {{ disk_data_count_int }}, disk_list_count_int: {{ disk_list_count_int }}"
+
+- name: Debug alphabet index
+  debug:
+    msg: "'abcdefghijklmnopqrstuvwxyz'[{{ disk_data_count_int }}]"
+
+- name: Check if counts are different and set new_disk if necessary
+  set_fact:
+    new_disk: "sd{{ 'abcdefghijklmnopqrstuvwxyz'[disk_data_count_int | int] }}"
+  when: disk_list_count_int > disk_data_count_int
+
+# - name: Debug new_disk variable
+#   debug:
+#     var: new_disk
+
+- name: Verify if all existing disks are formated and mounted as per the label of disk in Morpheus
+  include_tasks: existing_disk.yml
+  when: new_disk is not defined
+
+- name: Include a different role if new_disk is defined
+  include_tasks: new_disk.yml
+  when: new_disk is defined
+

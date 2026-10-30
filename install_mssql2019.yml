@@ -1,0 +1,17 @@
+---
+- name: Install SQL Server 2019 Developer Edition
+  hosts: all
+  gather_facts: yes
+
+  roles:
+    - role: mssql_server
+      vars:
+        sql_server_version: "2019"
+        sql_server_edition: "Developer"
+        sql_server_install_path: "C:\\SQLServer2019"
+        sql_server_config_path: "C:\\SQLServer2019\\ConfigurationFile.ini"
+        sql_server_media_path: "C:\\SQL2019\\Evaluation_ENU"
+        sql_server_sa_password: "{{ morpheus['customOptions']['sql_pass'] }}"
+        sql_server_instance_name: "MSSQLSERVER"
+        sql_server_features: "SQLENGINE,TOOLS,CONN,BC"
+        sql_db_team_ad_group : "db-sql-prod"

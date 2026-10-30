@@ -1,0 +1,40 @@
+#Compare the disks in OS with Morpheus volumes list. Skip sda and verify if other disks are partitioned and mounted as per label
+
+---
+- name: Disk count in Morpheus
+  debug:
+    msg: "Total number of disks on instance in Morpheus {{ disk_list_count }}./n Skipping sda check..."
+
+- name: Iterate through morpheus volumes and check mount points
+  block:
+    - name: Set the initial new_disk to null
+      set_fact:
+        new_disk_final: null
+
+    - name: Check if mount point exists
+      stat:
+        path: "{{ item.name }}"
+      register: mount_point_stat
+      with_items: "{{ morpheus['instance']['containers'][0]['server']['volumes'] }}"
+      when: item.deviceName != '/dev/sda'
+    
+    - name: Debug mount_point_stat
+      debug:
+        msg: "{{ mount_point_stat }}"
+
+    - name: Set the new_disk fact if mount point does not exist
+      set_fact:
+        new_disk_final: "{{ item.item.deviceName | regex_replace('/dev/', '') }}"
+      when: "item.stat is defined and not item.stat.exists and item.item.deviceName != '/dev/sda'"
+      with_items: "{{ mount_point_stat.results }}"
+
+    - name: Debug final new_disk
+      debug:
+        var: new_disk_final
+
+    - name: Include additional tasks if new_disk_final is defined
+      include_tasks: new_disk.yml
+      vars:
+        new_disk: "{{ new_disk_final }}"
+      when: new_disk_final is not none
+  when: disk_list_count_int == disk_data_count_int
